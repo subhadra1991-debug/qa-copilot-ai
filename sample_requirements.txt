@@ -1,0 +1,119 @@
+# Online Banking Application – Fund Transfer Module
+
+## Business Requirement Document
+
+### Overview
+
+The Online Banking Application allows customers to securely manage their bank accounts. This enhancement introduces a Fund Transfer module that enables customers to transfer money between their own accounts and to registered beneficiaries.
+
+---
+
+## Functional Requirements
+
+### FR-001: User Login
+
+1. The customer must log in using a valid username and password.
+2. After three consecutive failed login attempts, the account shall be locked for 30 minutes.
+3. A successful login shall redirect the user to the Account Summary page.
+
+---
+
+### FR-002: View Account Balance
+
+1. The customer shall be able to view all active accounts linked to their profile.
+2. The available balance and account number shall be displayed.
+3. Closed accounts shall not be displayed.
+
+---
+
+### FR-003: Add Beneficiary
+
+1. The customer shall be able to add a beneficiary by providing:
+
+   * Beneficiary Name
+   * Account Number
+   * Bank Name
+   * IFSC Code
+2. The account number must contain between 10 and 18 digits.
+3. The IFSC Code must be exactly 11 characters.
+4. A newly added beneficiary shall remain in "Pending Verification" status for 24 hours.
+5. The customer shall not be able to transfer funds to a beneficiary in Pending Verification status.
+
+---
+
+### FR-004: Fund Transfer
+
+1. The customer shall be able to transfer funds to a verified beneficiary.
+2. The transfer amount shall be greater than ₹0.
+3. The maximum transfer amount per transaction shall be ₹100,000.
+4. The daily transfer limit shall be ₹500,000.
+5. Transfers shall not be allowed when the available account balance is insufficient.
+6. A unique transaction reference number shall be generated for every successful transfer.
+7. The account balance shall be updated immediately after a successful transfer.
+
+---
+
+### FR-005: Transaction Confirmation
+
+1. Before processing a transfer, the system shall display a confirmation screen.
+2. The confirmation screen shall display:
+
+   * From Account
+   * Beneficiary Name
+   * Transfer Amount
+   * Transaction Charges
+3. The customer must confirm the transaction before processing.
+
+---
+
+### FR-006: Notifications
+
+1. A successful transfer shall trigger:
+
+   * SMS notification
+   * Email notification
+2. The notification shall include:
+
+   * Transaction Reference Number
+   * Transfer Amount
+   * Transaction Date and Time
+3. Notifications shall be sent within 2 minutes of transaction completion.
+
+---
+
+### FR-007: Transaction History
+
+1. The customer shall be able to view transaction history for the last 12 months.
+2. The customer shall be able to filter transactions by:
+
+   * Date Range
+   * Transaction Type
+   * Amount
+3. The customer shall be able to download transaction history as a PDF file.
+
+---
+
+## Non-Functional Requirements
+
+### NFR-001 Performance
+
+1. Fund transfer processing shall complete within 5 seconds under normal load.
+2. The system shall support 10,000 concurrent users.
+
+### NFR-002 Security
+
+1. All customer sessions shall expire after 15 minutes of inactivity.
+2. Sensitive information shall be encrypted during transmission.
+3. Users shall not be able to access another customer's account information.
+
+### NFR-003 Availability
+
+1. The application shall be available 99.9% of the time excluding planned maintenance windows.
+
+---
+
+## Assumptions
+
+1. Customers already have active bank accounts.
+2. SMS and Email gateway services are available.
+3. Internet connectivity is available during transactions.
