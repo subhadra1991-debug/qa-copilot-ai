@@ -1,7 +1,10 @@
 from groq import Groq
 from dotenv import load_dotenv
 import os
-
+from utils.prompts import (
+    SCENARIO_PROMPT,
+    GAP_ANALYSIS_PROMPT
+)
 load_dotenv()
 
 client = Groq(
@@ -10,19 +13,28 @@ client = Groq(
 
 def generate_test_scenarios(requirement_text):
 
-    prompt = f"""
-    You are a Senior QA Lead.
+    prompt = SCENARIO_PROMPT.format(
+            requirement=requirement_text
+        )
+    
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2
+    )
 
-    Analyze the requirement below and generate:
+    return response.choices[0].message.content
 
-    1. Functional Test Scenarios
-    2. Positive Test Scenarios
-    3. Negative Test Scenarios
-    4. Boundary Test Scenarios
+def analyze_requirement_gaps(requirement_text):
 
-    Requirement:
-    {requirement_text}
-    """
+    prompt = GAP_ANALYSIS_PROMPT.format(
+        requirement=requirement_text
+    )
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",

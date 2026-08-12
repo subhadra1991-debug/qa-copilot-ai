@@ -1,6 +1,10 @@
 import streamlit as st
 from utils.pdf_reader import extract_text
 from utils.groq_client import generate_test_scenarios
+from utils.groq_client import (
+    generate_test_scenarios,
+    analyze_requirement_gaps
+)
 st.set_page_config(
     page_title="QA-Copilot-AI",
     page_icon="🧪",
@@ -47,3 +51,14 @@ if uploaded_file:
             st.subheader("Generated Test Scenarios")
 
             st.markdown(scenarios)
+    if st.button("Find Requirement Gaps"):
+
+        with st.spinner("Analyzing requirement quality..."):
+
+            gap_analysis = analyze_requirement_gaps(
+            requirement_text
+        )
+
+        st.subheader("Requirement Gap Analysis")
+
+        st.markdown(gap_analysis)
