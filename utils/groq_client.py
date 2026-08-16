@@ -1,9 +1,11 @@
 from groq import Groq
 from dotenv import load_dotenv
+import json
 import os
 from utils.prompts import (
     SCENARIO_PROMPT,
-    GAP_ANALYSIS_PROMPT
+    GAP_ANALYSIS_PROMPT,
+    TEST_CASE_PROMPT
 )
 load_dotenv()
 
@@ -48,3 +50,25 @@ def analyze_requirement_gaps(requirement_text):
     )
 
     return response.choices[0].message.content
+
+
+def generate_test_cases(requirement_text):
+
+    prompt = TEST_CASE_PROMPT.format(
+        requirement=requirement_text
+    )
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2
+    )
+
+    result = response.choices[0].message.content
+
+    return result

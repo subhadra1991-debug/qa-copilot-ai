@@ -1,12 +1,28 @@
 SCENARIO_PROMPT = """
 You are a Senior QA Lead.
 
-Generate:
+Generate test scenarios in JSON format.
 
-1. Functional Test Scenarios
-2. Positive Test Scenarios
-3. Negative Test Scenarios
-4. Boundary Test Scenarios
+Return ONLY valid JSON.
+
+Format:
+
+[
+  {{
+    "Scenario_ID": "TS001",
+    "Scenario": "Verify successful login",
+    "Scenario_Type": "Positive",
+    "Priority": "High"
+  }}
+]
+
+Generate at least 15 scenarios.
+
+Include:
+- Positive Scenarios
+- Negative Scenarios
+- Boundary Scenarios
+- Security Scenarios
 
 Requirement:
 {requirement}
@@ -31,6 +47,32 @@ Identify:
 For each finding explain:
 - Why it is important
 - What defect could occur if ignored
+
+Requirement:
+{requirement}
+"""
+
+TEST_CASE_PROMPT = """
+You are a Senior QA Lead.
+
+Generate test cases in JSON format.
+
+Return ONLY valid JSON.
+
+Format:
+
+[
+  {{
+    "TC_ID": "TC001",
+    "Test_Scenario": "Verify successful login",
+    "Test_Steps": "Enter valid username and password and click Login",
+    "Test_Data": "user1/password1",
+    "Expected_Result": "User should login successfully",
+    "Priority": "High"
+  }}
+]
+
+Generate at least 15 test cases.
 
 Requirement:
 {requirement}
