@@ -1,13 +1,20 @@
 import streamlit as st
-import json
-import pandas as pd
-from io import BytesIO
 from utils.pdf_reader import extract_text
 
-from utils.groq_client import (
-    generate_test_scenarios,
-    analyze_requirement_gaps,
-    generate_test_cases
+from services.scenario_service import (
+    generate_scenarios
+)
+
+from services.gap_analysis_service import (
+    generate_gap_analysis
+)
+
+from services.testcase_service import (
+    generate_testcases
+)
+
+from utils.excel_exporter import (
+    dataframe_to_excel
 )
 
 # ---------------------------------
@@ -38,6 +45,7 @@ if "testcase_df" not in st.session_state:
 # ---------------------------------
 
 st.title("🧪 QA-Copilot-AI")
+
 st.subheader(
     "AI-Powered Requirement Analysis & Test Design Assistant"
 )
@@ -48,14 +56,14 @@ st.subheader(
 
 if st.button("🔄 Clear Results"):
 
-    st.session_state["scenario_output"] = None
+    st.session_state["scenario_df"] = None
     st.session_state["gap_output"] = None
     st.session_state["testcase_df"] = None
 
     st.rerun()
 
 # ---------------------------------
-# File Upload
+# Upload Requirement
 # ---------------------------------
 
 uploaded_file = st.file_uploader(
@@ -69,24 +77,39 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file:
 
-    st.success("File uploaded successfully!")
+    st.success(
+        "File uploaded successfully!"
+    )
 
-    st.write(f"Filename: {uploaded_file.name}")
-    st.write(f"File Type: {uploaded_file.type}")
+    st.write(
+        f"Filename: {uploaded_file.name}"
+    )
 
-    requirement_text = extract_text(uploaded_file)
+    st.write(
+        f"File Type: {uploaded_file.type}"
+    )
 
-    if len(requirement_text.strip()) == 0:
+    requirement_text = extract_text(
+        uploaded_file
+    )
+
+    if len(
+        requirement_text.strip()
+    ) == 0:
 
         st.error(
-            "Uploaded file is empty. Please upload a valid requirement document."
+            "Uploaded file is empty."
         )
 
     else:
 
+        # -------------------------
         # Requirement Preview
+        # -------------------------
 
-        st.subheader("Requirement Preview")
+        st.subheader(
+            "Requirement Preview"
+        )
 
         st.text_area(
             "Extracted Requirement",
@@ -94,13 +117,15 @@ if uploaded_file:
             height=300
         )
 
-        # Buttons
+        # -------------------------
+        # Action Buttons
+        # -------------------------
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
 
-            generate_clicked = st.button(
+            scenario_clicked = st.button(
                 "Generate Test Scenarios"
             )
 
@@ -117,34 +142,27 @@ if uploaded_file:
             )
 
         # -------------------------
-        # Scenario Generation
+        # Generate Scenarios
         # -------------------------
 
-        if generate_clicked:
+        if scenario_clicked:
 
             with st.spinner(
                 "Generating test scenarios..."
             ):
 
-                
-                scenarios = generate_test_scenarios(
-                requirement_text
-                )
-
-                scenario_json = json.loads(
-                scenarios
-                )
-
-                scenario_df = pd.DataFrame(
-                scenario_json
+                scenario_df = (
+                    generate_scenarios(
+                        requirement_text
+                    )
                 )
 
                 st.session_state[
-                "scenario_df"
+                    "scenario_df"
                 ] = scenario_df
 
         # -------------------------
-        # Gap Analysis
+        # Requirement Gaps
         # -------------------------
 
         if gap_clicked:
@@ -153,16 +171,18 @@ if uploaded_file:
                 "Analyzing requirements..."
             ):
 
-                gap_analysis = analyze_requirement_gaps(
-                    requirement_text
+                gap_output = (
+                    generate_gap_analysis(
+                        requirement_text
+                    )
                 )
 
                 st.session_state[
                     "gap_output"
-                ] = gap_analysis
+                ] = gap_output
 
         # -------------------------
-        # Test Case Generation
+        # Generate Test Cases
         # -------------------------
 
         if testcase_clicked:
@@ -171,39 +191,31 @@ if uploaded_file:
                 "Generating test cases..."
             ):
 
-                test_cases = generate_test_cases(
-                    requirement_text
-                )
-
                 try:
 
-                    test_cases_json = json.loads(
-                        test_cases
-                    )
-
-                    df = pd.DataFrame(
-                        test_cases_json
+                    testcase_df = (
+                        generate_testcases(
+                            requirement_text
+                        )
                     )
 
                     st.session_state[
                         "testcase_df"
-                    ] = df
+                    ] = testcase_df
 
                 except Exception as e:
 
                     st.error(
-                        f"Error processing test cases: {e}"
-                    )
-
-                    st.code(
-                        test_cases
+                        f"Error: {e}"
                     )
 
 # ---------------------------------
-# Display Scenario Output
+# Display Scenarios
 # ---------------------------------
 
-if st.session_state["scenario_df"] is not None:
+if st.session_state[
+    "scenario_df"
+] is not None:
 
     scenario_df = st.session_state[
         "scenario_df"
@@ -218,22 +230,14 @@ if st.session_state["scenario_df"] is not None:
         use_container_width=True
     )
 
-    output = BytesIO()
-
-    with pd.ExcelWriter(
-        output,
-        engine="openpyxl"
-    ) as writer:
-
-        scenario_df.to_excel(
-            writer,
-            index=False,
-            sheet_name="Scenarios"
-        )
+    excel_data = dataframe_to_excel(
+        scenario_df,
+        sheet_name="Scenarios"
+    )
 
     st.download_button(
         label="📥 Download Scenarios Excel",
-        data=output.getvalue(),
+        data=excel_data,
         file_name="test_scenarios.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
@@ -242,7 +246,9 @@ if st.session_state["scenario_df"] is not None:
 # Display Gap Analysis
 # ---------------------------------
 
-if st.session_state["gap_output"]:
+if st.session_state[
+    "gap_output"
+]:
 
     st.subheader(
         "Requirement Gap Analysis"
@@ -258,9 +264,11 @@ if st.session_state["gap_output"]:
 # Display Test Cases
 # ---------------------------------
 
-if st.session_state["testcase_df"] is not None:
+if st.session_state[
+    "testcase_df"
+] is not None:
 
-    df = st.session_state[
+    testcase_df = st.session_state[
         "testcase_df"
     ]
 
@@ -269,31 +277,22 @@ if st.session_state["testcase_df"] is not None:
     )
 
     st.write(
-        f"Number of Test Cases: {len(df)}"
+        f"Number of Test Cases: {len(testcase_df)}"
     )
 
     st.dataframe(
-        df,
+        testcase_df,
         use_container_width=True
     )
 
-    # Excel Export
-
-    excel_file = "test_cases.xlsx"
-
-    df.to_excel(
-        excel_file,
-        index=False
+    excel_data = dataframe_to_excel(
+        testcase_df,
+        sheet_name="TestCases"
     )
 
-    with open(
-        excel_file,
-        "rb"
-    ) as file:
-
-        st.download_button(
-            label="📥 Download Test Cases Excel",
-            data=file,
-            file_name="test_cases.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+    st.download_button(
+        label="📥 Download Test Cases Excel",
+        data=excel_data,
+        file_name="test_cases.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )

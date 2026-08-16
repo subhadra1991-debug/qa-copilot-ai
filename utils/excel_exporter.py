@@ -1,13 +1,25 @@
+from io import BytesIO
 import pandas as pd
 
 
-def export_testcases_to_excel(df):
+def dataframe_to_excel(
+    df,
+    sheet_name="Sheet1"
+):
 
-    file_name = "test_cases.xlsx"
+    output = BytesIO()
 
-    df.to_excel(
-        file_name,
-        index=False
-    )
+    with pd.ExcelWriter(
+        output,
+        engine="openpyxl"
+    ) as writer:
 
-    return file_name
+        df.to_excel(
+            writer,
+            index=False,
+            sheet_name=sheet_name
+        )
+
+    output.seek(0)
+
+    return output.getvalue()
