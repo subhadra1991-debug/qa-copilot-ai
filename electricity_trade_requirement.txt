@@ -1,0 +1,137 @@
+# Electricity Demand and Supply Trade Management System
+
+## Business Overview
+
+The Electricity Trade Management System (ETMS) enables electricity operators to manage electricity demand and supply transactions between electricity suppliers and electricity buyers.
+
+The operator acts as an intermediary and facilitates electricity trades in the wholesale electricity market.
+
+The system should allow suppliers to submit available electricity capacity and buyers to submit electricity demand requests.
+
+The system should automatically match demand and supply based on quantity, delivery date, and market region.
+
+---
+
+## Supplier Management
+
+The system shall allow suppliers to register using:
+
+* Supplier ID
+* Supplier Name
+* Contact Details
+* Market Region
+
+A supplier may submit one or more electricity supply offers.
+
+Each offer shall contain:
+
+* Offer ID
+* Available Quantity (MWh)
+* Delivery Date
+* Price per MWh
+* Market Region
+
+The system shall store all submitted offers.
+
+---
+
+## Buyer Management
+
+The system shall allow buyers to register using:
+
+* Buyer ID
+* Buyer Name
+* Contact Details
+* Market Region
+
+A buyer may submit one or more electricity demand requests.
+
+Each demand request shall contain:
+
+* Request ID
+* Required Quantity (MWh)
+* Delivery Date
+* Maximum Price per MWh
+* Market Region
+
+The system shall store all submitted demand requests.
+
+---
+
+## Trade Matching
+
+The system shall automatically perform trade matching every 15 minutes.
+
+A match shall be created when:
+
+* Market Region is the same
+* Delivery Date is the same
+* Available Quantity is greater than or equal to requested quantity
+* Supplier Price is less than or equal to Buyer's Maximum Price
+
+When multiple suppliers satisfy the criteria, the supplier with the lowest price shall be selected.
+
+A Trade ID shall be generated for every successful trade.
+
+---
+
+## Notifications
+
+The system shall notify suppliers and buyers when a trade is successfully matched.
+
+Notifications shall be visible within the application.
+
+---
+
+## Reporting
+
+The system shall provide reports for:
+
+* Open Supply Offers
+* Open Demand Requests
+* Matched Trades
+* Cancelled Trades
+
+Reports shall be downloadable in Excel format.
+
+---
+
+## User Roles
+
+The system shall support:
+
+1. Operator
+2. Supplier
+3. Buyer
+
+The Operator shall be able to view all trades.
+
+Suppliers shall only view their own supply offers.
+
+Buyers shall only view their own demand requests.
+
+---
+
+## Audit Logging
+
+The system shall maintain an audit trail for:
+
+* Offer Creation
+* Demand Request Creation
+* Trade Match Creation
+* Trade Cancellation
+
+The audit log shall capture:
+
+* User ID
+* Timestamp
+* Action Performed
+
+---
+
+## Non-Functional Requirements
+
+* System shall support 1000 concurrent users.
+* Trade matching shall complete within 30 seconds.
+* System availability shall be 99.9%.
+* User sessions shall expire after 15 minutes of inactivity.

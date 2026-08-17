@@ -16,7 +16,9 @@ from services.testcase_service import (
 from utils.excel_exporter import (
     dataframe_to_excel
 )
-
+from services.ba_question_service import (
+    generate_questions
+)
 # ---------------------------------
 # Page Configuration
 # ---------------------------------
@@ -40,6 +42,9 @@ if "gap_output" not in st.session_state:
 if "testcase_df" not in st.session_state:
     st.session_state["testcase_df"] = None
 
+if "ba_question_df" not in st.session_state:
+    st.session_state["ba_question_df"] = None
+
 # ---------------------------------
 # Title
 # ---------------------------------
@@ -54,13 +59,14 @@ st.subheader(
 # Clear Results Button
 # ---------------------------------
 
-if st.button("🔄 Clear Results"):
+if st.button("🗑️ Clear Generated Results"):
 
     st.session_state["scenario_df"] = None
     st.session_state["gap_output"] = None
     st.session_state["testcase_df"] = None
+    st.session_state["ba_question_df"] = None
 
-    st.rerun()
+    #st.rerun()
 
 # ---------------------------------
 # Upload Requirement
@@ -121,7 +127,7 @@ if uploaded_file:
         # Action Buttons
         # -------------------------
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
 
         with col1:
 
@@ -139,6 +145,11 @@ if uploaded_file:
 
             testcase_clicked = st.button(
                 "Generate Test Cases"
+            )
+        with col4:
+
+            ba_clicked = st.button(
+                "Generate BA Questions"
             )
 
         # -------------------------
@@ -208,6 +219,27 @@ if uploaded_file:
                     st.error(
                         f"Error: {e}"
                     )
+        if ba_clicked:
+
+            with st.spinner(
+                "Generating BA Questions..."
+            ):
+
+                try:
+
+                    ba_df = generate_questions(
+                    requirement_text
+                    )
+
+                    st.session_state[
+                        "ba_question_df"
+                    ] = ba_df
+
+                except Exception as e:
+
+                    st.error(
+                    f"Error: {e}"
+            )
 
 # ---------------------------------
 # Display Scenarios
@@ -294,5 +326,39 @@ if st.session_state[
         label="📥 Download Test Cases Excel",
         data=excel_data,
         file_name="test_cases.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+
+if st.session_state[
+    "ba_question_df"
+] is not None:
+
+    ba_df = st.session_state[
+        "ba_question_df"
+    ]
+
+    st.subheader(
+        "BA Clarification Questions"
+    )
+
+    st.write(
+        f"Number of Questions: {len(ba_df)}"
+    )
+
+    st.dataframe(
+        ba_df,
+        use_container_width=True
+    )
+
+    excel_data = dataframe_to_excel(
+        ba_df,
+        sheet_name="BA_Questions"
+    )
+
+    st.download_button(
+        label="📥 Download BA Questions Excel",
+        data=excel_data,
+        file_name="ba_questions.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )

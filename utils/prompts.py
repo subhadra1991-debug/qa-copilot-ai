@@ -77,3 +77,43 @@ Generate at least 15 test cases.
 Requirement:
 {requirement}
 """
+
+BA_QUESTION_PROMPT = """
+You are a Senior Business Analyst and QA Lead.
+
+Analyze the requirement and identify all
+clarification questions that should be asked
+before testing begins.
+
+Return ONLY valid JSON.
+
+Format:
+
+[
+    {{
+        "Question_ID": "BA001",
+        "Question": "What happens if user enters invalid email?",
+        "Category": "Validation",
+        "Priority": "High"
+    }}
+]
+
+Generate at least 15 questions.
+
+Cover:
+
+- Business Rules
+- Validation Rules
+- Boundary Conditions
+- Error Handling
+- Security
+- Integration
+- Notifications
+- User Roles
+- Data Persistence
+- Reporting
+
+Requirement:
+
+{requirement}
+"""
