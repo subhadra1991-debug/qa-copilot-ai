@@ -7,7 +7,8 @@ from utils.prompts import (
     SCENARIO_PROMPT,
     GAP_ANALYSIS_PROMPT,
     TEST_CASE_PROMPT,
-    BA_QUESTION_PROMPT
+    BA_QUESTION_PROMPT,
+    RTM_PROMPT
 )
 load_dotenv()
 
@@ -22,7 +23,7 @@ def generate_test_scenarios(requirement_text):
         )
     
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "user",
@@ -41,7 +42,7 @@ def analyze_requirement_gaps(requirement_text):
     )
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "user",
@@ -61,7 +62,7 @@ def generate_test_cases(requirement_text):
     )
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "user",
@@ -85,7 +86,26 @@ def generate_ba_questions(
     )
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2
+    )
+
+    return response.choices[0].message.content
+
+def generate_rtm(requirement_text):
+
+    prompt = RTM_PROMPT.format(
+        requirement=requirement_text
+    )
+
+    response = client.chat.completions.create(
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "user",

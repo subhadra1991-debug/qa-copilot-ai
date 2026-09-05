@@ -19,6 +19,12 @@ from utils.excel_exporter import (
 from services.ba_question_service import (
     generate_questions
 )
+from services.rtm_service import (
+    generate_rtm_matrix
+)
+from services.orchestrator_service import (
+    run_complete_qa_analysis
+)
 # ---------------------------------
 # Page Configuration
 # ---------------------------------
@@ -45,6 +51,12 @@ if "testcase_df" not in st.session_state:
 if "ba_question_df" not in st.session_state:
     st.session_state["ba_question_df"] = None
 
+if "rtm_df" not in st.session_state:
+    st.session_state["rtm_df"] = None
+
+if "orchestrator_results" not in st.session_state:
+    st.session_state["orchestrator_results"] = None
+
 # ---------------------------------
 # Title
 # ---------------------------------
@@ -65,6 +77,7 @@ if st.button("🗑️ Clear Generated Results"):
     st.session_state["gap_output"] = None
     st.session_state["testcase_df"] = None
     st.session_state["ba_question_df"] = None
+    st.session_state["orchestrator_results"] = None
 
     #st.rerun()
 
@@ -127,7 +140,7 @@ if uploaded_file:
         # Action Buttons
         # -------------------------
 
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
 
@@ -151,7 +164,16 @@ if uploaded_file:
             ba_clicked = st.button(
                 "Generate BA Questions"
             )
+        with col5:
 
+            rtm_clicked = st.button(
+                "Generate RTM"
+            )
+        with col6:
+
+            orchestrator_clicked = st.button(
+                "🚀 Complete QA Analysis"
+            )
         # -------------------------
         # Generate Scenarios
         # -------------------------
@@ -240,6 +262,33 @@ if uploaded_file:
                     st.error(
                     f"Error: {e}"
             )
+        if rtm_clicked:
+
+            with st.spinner(
+            "Generating RTM..."
+            ):
+
+                rtm_df = generate_rtm_matrix(
+                requirement_text
+                )
+
+                st.session_state[
+                "rtm_df"
+                ] = rtm_df
+
+        if orchestrator_clicked:
+
+            with st.spinner(
+            "Running complete QA analysis..."
+            ):
+
+                results = run_complete_qa_analysis(
+                requirement_text
+                )
+
+                st.session_state[
+                "orchestrator_results"
+                ] = results
 
 # ---------------------------------
 # Display Scenarios
@@ -361,4 +410,103 @@ if st.session_state[
         data=excel_data,
         file_name="ba_questions.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+# ---------------------------------
+# Display RTM
+# ---------------------------------
+if st.session_state[
+    "rtm_df"
+] is not None:
+
+    rtm_df = st.session_state[
+        "rtm_df"
+    ]
+
+    st.subheader(
+        "Requirements Traceability Matrix"
+    )
+
+    st.dataframe(
+        rtm_df,
+        use_container_width=True
+    )
+
+    excel_data = dataframe_to_excel(
+        rtm_df,
+        sheet_name="RTM"
+    )
+
+    st.download_button(
+        label="📥 Download RTM Excel",
+        data=excel_data,
+        file_name="rtm.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+# ---------------------------------
+# Display Orchestrator
+# ---------------------------------
+if st.session_state[
+    "orchestrator_results"
+] is not None:
+
+    results = st.session_state[
+        "orchestrator_results"
+    ]
+
+    st.header(
+        "🚀 Complete QA Analysis Report"
+    )
+
+    # Gap Analysis
+
+    st.subheader(
+        "Requirement Gap Analysis"
+    )
+
+    st.markdown(
+        results["gap_analysis"]
+    )
+
+    # BA Questions
+
+    st.subheader(
+        "BA Questions"
+    )
+
+    st.dataframe(
+        results["ba_questions"],
+        use_container_width=True
+    )
+
+    # Scenarios
+
+    st.subheader(
+        "Test Scenarios"
+    )
+
+    st.dataframe(
+        results["scenarios"],
+        use_container_width=True
+    )
+
+    # Test Cases
+
+    st.subheader(
+        "Test Cases"
+    )
+
+    st.dataframe(
+        results["test_cases"],
+        use_container_width=True
+    )
+
+    # RTM
+
+    st.subheader(
+        "Requirement Traceability Matrix"
+    )
+
+    st.dataframe(
+        results["rtm"],
+        use_container_width=True
     )

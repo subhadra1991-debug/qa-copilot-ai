@@ -214,10 +214,45 @@ http://localhost:8501
 * Reusable Excel Export Utility
 * Improved Code Maintainability
 
-## Upcoming Sprint 9
+## Sprint 9
 
 * BA Question Generator
 * BA Question Excel Export
+* Dedicated BA Question Service
+* Structured BA Question Output
+
+## Sprint 10
+
+* requirement traceability matrix  
+* Excel export
+
+## Sprint 11
+
+* QA Workflow Orchestrator
+* Complete QA Analysis Button
+* Automated Execution of:
+  * Gap Analysis
+  * BA Questions
+  * Test Scenarios
+  * Test Cases
+  * RTM Generation
+* Consolidated QA Analysis Report
+* Workflow-Based Architecture Foundation
+
+🚀 Future Roadmap
+## Sprint 12
+* Intelligent QA Agent
+* Intent Detection
+* Dynamic Tool Selection
+## Sprint 13
+* Agent Memory
+* Context Management
+## Sprint 14
+* Evaluation Framework
+* Coverage Scoring
+## Sprint 15
+* MCP Integration
+* Tool Registry
 
 ---
 
@@ -234,6 +269,8 @@ To build an AI-powered QA Copilot that assists software testers throughout the e
 * RTM Generation
 * Test Data Generation
 * Automation Accelerator
+
+
 
 ---
 

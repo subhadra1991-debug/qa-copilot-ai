@@ -117,3 +117,34 @@ Requirement:
 
 {requirement}
 """
+
+
+
+RTM_PROMPT = """
+You are a Senior QA Lead.
+
+Analyze the requirement.
+
+Generate a Requirements Traceability Matrix.
+
+Return ONLY valid JSON.
+
+Format:
+
+[
+    {{
+        "Requirement_ID":"R001",
+        "Requirement":"User Login",
+        "Scenario_ID":"TS001",
+        "Scenario":"Verify successful login",
+        "Test_Case_ID":"TC001",
+        "Test_Case":"Verify login with valid credentials"
+    }}
+]
+
+Generate at least 15 rows.
+
+Requirement:
+
+{requirement}
+"""
